@@ -26,3 +26,21 @@ GO
 ALTER TABLE [adf].[DatabaseServer] ADD  DEFAULT ((0)) FOR [IsSynapse]
 GO
 
+--	insert into [adf].[DatabaseServer] 
+--	( 
+--		[FriendlyDatabaseName]
+--		,[DatabaseServerName]
+--		,[DatabaseName]
+--		,[ResourceGroup]
+--		,[SubscriptionId]
+--		,[IsSynapse]
+--	)
+--	VALUES 
+--	( ------ change the values to your synapse instance
+--		'' ----workspace name
+--		,'.sql.azuresynapse.net'  ---- synapse server string
+--		,'sqlpool01'  ------ sql pool name
+--		,''----- resource group 
+--		,''   ---- subscription id
+--		,1
+--	) 
