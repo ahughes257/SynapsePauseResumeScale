@@ -1,0 +1,102 @@
+{
+    "name": "PauseSQLPool",
+    "properties": {
+        "activities": [
+            {
+                "name": "GetSynapseDetails",
+                "type": "Lookup",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "AzureSqlSource",
+                        "queryTimeout": "02:00:00",
+                        "partitionOption": "None"
+                    },
+                    "dataset": {
+                        "referenceName": "Application",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "schema": "app",
+                            "table": "DatabaseServer"
+                        }
+                    },
+                    "firstRowOnly": false
+                }
+            },
+            {
+                "name": "ForEach1",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "GetSynapseDetails",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('GetSynapseDetails').output.value",
+                        "type": "Expression"
+                    },
+                    "isSequential": true,
+                    "activities": [
+                        {
+                            "name": "If Condition1",
+                            "type": "IfCondition",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "expression": {
+                                    "value": "@equals(\n            item().IsSynapse, \n            TRUE\n        )",
+                                    "type": "Expression"
+                                },
+                                "ifTrueActivities": [
+                                    {
+                                        "name": "PauseSQLPool",
+                                        "type": "WebActivity",
+                                        "dependsOn": [],
+                                        "policy": {
+                                            "timeout": "7.00:00:00",
+                                            "retry": 0,
+                                            "retryIntervalInSeconds": 30,
+                                            "secureOutput": false,
+                                            "secureInput": false
+                                        },
+                                        "userProperties": [],
+                                        "typeProperties": {
+                                            "url": {
+                                                "value": "@concat('https://management.azure.com/subscriptions/',item().SubscriptionId,'/resourceGroups/',item().ResourceGroup,'/providers/Microsoft.Synapse/workspaces/',item().FriendlyDatabaseName,'/sqlPools/',item().DatabaseName,'/pause?api-version=2019-06-01-preview')",
+                                                "type": "Expression"
+                                            },
+                                            "method": "POST",
+                                            "authentication": {
+                                                "type": "MSI",
+                                                "resource": "https://management.core.windows.net"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "folder": {
+            "name": "SQLPool"
+        },
+        "annotations": [],
+        "lastPublishTime": "2020-11-05T10:19:38Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
