@@ -79,6 +79,10 @@
                                                 "type": "Expression"
                                             },
                                             "method": "POST",
+                                            "body": {
+                                                "value": "@concat('{','}')",
+                                                "type": "Expression"
+                                            },
                                             "authentication": {
                                                 "type": "MSI",
                                                 "resource": "https://management.core.windows.net"
